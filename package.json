@@ -3,6 +3,8 @@
   "displayName": "EmberCase",
   "description": "It concerts deprecated Ember component syntax to new one",
   "version": "0.0.1",
+  "license": "MIT",
+  "publisher": "behnegar-mehran-naghizadeh",
   "engines": {
     "vscode": "^1.76.0"
   },
@@ -45,5 +47,9 @@
     "webpack": "^5.75.0",
     "webpack-cli": "^5.0.1",
     "@vscode/test-electron": "^2.2.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mehran-naghizadeh/ember-case.git"
   }
 }
