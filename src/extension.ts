@@ -80,7 +80,9 @@ function convertAssignment(text: string): string {
   }
 
 function convertTag(text: string): string {
-  return text.replace('{{#', '{{').split(/\s+/)
+  const pattern = /\s+(?=(?:(?:[^"]*"){2})*[^"]*$)/g;
+
+  return text.replace('{{#', '{{').split(pattern)
     .map((part: string) => {
       switch(true) {
         case part.includes('='):
@@ -101,7 +103,7 @@ function convertTag(text: string): string {
 function assignmentCase(input: string): string {
   const [left, right] = input.split('=');
 
-  const LHS = (left.charAt(0) === '@') ? left : ('@' + left);
+  const LHS = (left.charAt(0) === '@' || left === 'class') ? left : ('@' + left);
   const sanitizedRight = right.replace('}}', '');
 
   const isQuoted = ['"', "'"].includes(sanitizedRight.charAt(0));
