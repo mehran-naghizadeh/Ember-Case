@@ -2,6 +2,12 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
+// Pattern: {{/some/where/quite-strange/some-thing}}
+const blockClosingPattern = /^{{\/([\w/-]+)}}$/;
+const blockStartingPattern = /^{{#([\w/-]+)([^}}]*)(}})?$/;
+const multilinerStartingPattern = /^{{(?!\/)([\w/-]+)([^}}]*)$/;
+const onelinerPattern = /^{{(?!\/)([\w/-]+)(.*)}}$/;
+
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -41,10 +47,14 @@ function convertedText(text: string): string {
   switch(true) {
     case text === '}}':
       return '/>';
-    case text.indexOf('{{') === 0:
+    case blockClosingPattern.test(text):
+      return convertBlockClosing(text);
+    case onelinerPattern.test(text):
+    case blockStartingPattern.test(text):
+    case multilinerStartingPattern.test(text):
       return convertTag(text);
     case text.includes(':') || text.includes('='):
-      return convertAssignment(text);
+      return assignmentCase(text);
     case text.includes('this.get('):
       return convertGet(text);
     default:
@@ -60,37 +70,22 @@ function convertGet(text: string): string {
     .replace(/this\.get\('(\w+)\'\)/, 'this.$1');
 }
 
-function convertAssignment(text: string): string {
-  const isThisable = (x: string) => !['true', 'false', 'undefined'].includes(x);
-  const addThis = (x: string) => (isThisable(x) ? 'this.' : '') + x;
-  const rhs = (x: string) => isNumber(x) ? x : wrapInCurlyBraces(addThis(x));
-
-  return text
-    .replace(/(\w+)=\s*\(*true\)*/, `@$1={{true}}`)
-    .replace(/(\w+)=\s*\(*false\)*/, `@$1={{false}}`)
-    .replace(/(\w+)=\s*\(*undefined\)*/, `@$1={{undefined}}`)
-    .replace(/(\w+):\s*(\w+)\,/, '$1 = $2;')
-    .replace(/(\w+)=\s*(\d+)/, '@$1=$2')
-    .replace(/(\w+)=\s*\((.+)\)/, '@$1={{$2}}')
-    .replace(/(\w+)=\s*(\D\w+)/, '@$1={{this.$2}}')
-    .replace('{{true}}', 'true')
-    .replace('{{false}}', 'false')
-    .replace('{{undefined}}', 'undefined')
-    .replace(/@(class|placeholder)=/, '@$1=');
-  }
-
 function convertTag(text: string): string {
   const pattern = /\s+(?=(?:(?:[^"]*"){2})*[^"]*$)/g;
 
-  return text.replace('{{#', '{{').split(pattern)
+  const isOneliner = onelinerPattern.test(text);
+
+  return text.replace('}}', isOneliner ? ' />' : '>').split(pattern)
     .map((part: string) => {
       switch(true) {
         case part.includes('='):
           return assignmentCase(part);
+        case part.indexOf('{{#') === 0:
+          return `<${emberPascalCase(part.slice(3))}`;
         case part.indexOf('{{') === 0:
           return `<${emberPascalCase(part.slice(2))}`;
         case part.indexOf('}}') === part.length - 2:
-          return `${emberPascalCase(part.slice(0, part.length - 2))}>`;
+          return `${emberPascalCase(part.slice(0, part.length - 2))}${isOneliner ? ' />' : '>'}`;
         default:
           break;
       }
@@ -100,7 +95,13 @@ function convertTag(text: string): string {
     .join(' ');
 }
 
+function convertBlockClosing(text: string) {
+  return text.replace(blockClosingPattern, (match, path) => `</${emberPascalCase(path)}>`);
+}
+
 function assignmentCase(input: string): string {
+  console.log(`Assignment: ${input}`);
+
   const [left, right] = input.split('=');
 
   const LHS = (left.charAt(0) === '@' || left === 'class') ? left : ('@' + left);
@@ -111,7 +112,7 @@ function assignmentCase(input: string): string {
     ? Number(sanitizedRight)
     : (isQuoted ? wrapInProperQuotes(sanitizedRight, left) :  wrapInCurlyBraces(sanitizedRight));
 
-  return `${LHS}=${RHS}` + (sanitizedRight === right ? '' : '>');
+  return [LHS,RHS].join('=');
 }
 
 function isNumber(x: string): boolean {
