@@ -33,12 +33,17 @@ export function activate(context: vscode.ExtensionContext) {
 
     editor.edit((editBuilder: vscode.TextEditorEdit) => {
       selections.forEach((selection) => {
-        const line = document.lineAt(selection.active.line);
-        const { text } = line;
+        // Get all lines within the current selection
+        const selectedLines = document.getText(selection).split('\n');
 
-        const indentSteps = text.indexOf(text.trim());
-        const indentation = new Array(indentSteps + 1).join(' ');
-        editBuilder.replace(line.range, `${indentation}${convertedText(text.trim())}`);
+        selectedLines.forEach((lineText, index) => {
+          const line = document.lineAt(selection.start.line + index);
+          const fullLineText = document.getText(line.range);
+
+          const indentSteps = fullLineText.indexOf(fullLineText.trim());
+          const indentation = new Array(indentSteps + 1).join(' ');
+          editBuilder.replace(line.range, `${indentation}${convertedText(fullLineText.trim())}`);
+        });
       });
     });
   });
