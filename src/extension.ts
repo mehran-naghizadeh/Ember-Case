@@ -29,15 +29,17 @@ export function activate(context: vscode.ExtensionContext) {
 
     if (!editor) { return; }
 
-    const { document, selection } = editor;
-    const line = document.lineAt(selection.active.line);
-    const text = line.text;
-
-    const indentSteps = text.indexOf(text.trim());
-    const indentation = new Array(indentSteps + 1).join(' ');
+    const { document, selections } = editor;
 
     editor.edit((editBuilder: vscode.TextEditorEdit) => {
-      editBuilder.replace(line.range, `${indentation}${convertedText(text.trim())}`);
+      selections.forEach((selection) => {
+        const line = document.lineAt(selection.active.line);
+        const { text } = line;
+
+        const indentSteps = text.indexOf(text.trim());
+        const indentation = new Array(indentSteps + 1).join(' ');
+        editBuilder.replace(line.range, `${indentation}${convertedText(text.trim())}`);
+      });
     });
   });
 
