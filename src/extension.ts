@@ -2,11 +2,15 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
+// Pattern x=y.yy z=5 class="w-8 h-2 whatever"
+const pattern = /\s+(?=(?:(?:[^"]*"){2})*[^"]*$)/g;
+
 // Pattern: {{/some/where/quite-strange/some-thing}}
 const blockClosingPattern = /^{{\/([\w/-]+)}}$/;
 const blockStartingPattern = /^{{#([\w/-]+)([^}}]*)(}})?$/;
 const multilinerStartingPattern = /^{{(?!\/)([\w/-]+)([^}}]*)$/;
 const onelinerPattern = /^{{(?!\/)([\w/-]+)(.*)}}$/;
+const assignmentsLinePattern = /^((\w+=[^\s]+)\s?)+$/;
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -53,8 +57,8 @@ function convertedText(text: string): string {
     case blockStartingPattern.test(text):
     case multilinerStartingPattern.test(text):
       return convertTag(text);
-    case text.includes(':') || text.includes('='):
-      return assignmentCase(text);
+    case assignmentsLinePattern.test(text):
+      return text.split(pattern).map(p => assignmentCase(p)).join(' ');
     case text.includes('this.get('):
       return convertGet(text);
     default:
@@ -71,8 +75,6 @@ function convertGet(text: string): string {
 }
 
 function convertTag(text: string): string {
-  const pattern = /\s+(?=(?:(?:[^"]*"){2})*[^"]*$)/g;
-
   const isOneliner = onelinerPattern.test(text);
 
   return text.replace('}}', isOneliner ? ' />' : '>').split(pattern)
