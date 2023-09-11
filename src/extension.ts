@@ -3,14 +3,16 @@
 import * as vscode from 'vscode';
 
 // Pattern x=y.yy z=5 class="w-8 h-2 whatever"
-const pattern = /\s+(?=(?:(?:[^"]*"){2})*[^"]*$)/g;
+// const pattern = /\s+(?=(?:(?:[^"]*"){2})*[^"]*$)/g;
+const pattern = /(?:[^"'\s()]*(?:"[^"]*"[^"'\s()]*)*|[^"'\s()]+|\([^)]*\)|}})+/g;
 
 // Pattern: {{/some/where/quite-strange/some-thing}}
 const blockClosingPattern = /^{{\/([\w/-]+)}}$/;
 const blockStartingPattern = /^{{#([\w/-]+)([^}}]*)(}})?$/;
 const multilinerStartingPattern = /^{{(?!\/)([\w/-]+)([^}}]*)$/;
 const onelinerPattern = /^{{(?!\/)([\w/-]+)(.*)}}$/;
-const assignmentsLinePattern = /^((\w+=[^\s]+)\s?)+$/;
+const assignmentPattern = /\w+\s*=\s*(?:\([^)]+\)|\S+)/g;
+const assignmentsLinePattern = /^(\w+\s*=.+)+$/;
 const emberKeywordsPattern = /^({{(#|\/)?)(each|if|else|else if|let|unless)( |}})/;
 const helpersPattern = /^({{(#|\/)?)(array|component|compute|eq|get|gt|lt)( |}})/;
 
@@ -70,7 +72,8 @@ function convertedText(text: string): string {
     case multilinerStartingPattern.test(text):
       return convertTag(text);
     case assignmentsLinePattern.test(text):
-      return text.split(pattern).map(p => assignmentCase(p)).join(' ');
+      const matches = [...new Set(text.match(assignmentPattern))].filter(x => x.length);
+      return matches.map(p => assignmentCase(p)).join(' ');
     case text.includes('this.get('):
       return convertGet(text);
     default:
@@ -89,24 +92,45 @@ function convertGet(text: string): string {
 function convertTag(text: string): string {
   const isOneliner = onelinerPattern.test(text);
 
-  return text.replace('}}', isOneliner ? ' />' : '>').split(pattern)
-    .map((part: string) => {
-      switch(true) {
-        case part.includes('='):
-          return assignmentCase(part);
-        case part.indexOf('{{#') === 0:
-          return `<${emberPascalCase(part.slice(3))}`;
-        case part.indexOf('{{') === 0:
-          return `<${emberPascalCase(part.slice(2))}`;
-        case part.indexOf('}}') === part.length - 2:
-          return `${emberPascalCase(part.slice(0, part.length - 2))}${isOneliner ? ' />' : '>'}`;
-        default:
-          break;
-      }
+  // const parts = text.replace('}}', isOneliner ? ' />' : '>').split(pattern);
+  const parts = text.match(pattern)?.filter(x => x.length) ?? [];
 
-      return part;
-    })
-    .join(' ');
+  return parts.map((part: string, index: number) => {
+    const closing = part.endsWith('}}') ? (isOneliner ? ' />' : '>') : '';
+
+    return processPart(part.replace(/}}$/, '')) + closing;
+
+    // switch(true) {
+    //   case part.includes('='):
+    //     return assignmentCase(part);
+    //   case part.indexOf('{{#') === 0:
+    //     return `<${emberPascalCase(part.slice(3))}`;
+    //   case part.indexOf('{{') === 0:
+    //     return `<${emberPascalCase(part.slice(2))}`;
+    //   case part.indexOf('}}') === part.length - 2:
+    //     return `${emberPascalCase(part.slice(0, part.length - 2))}${isOneliner ? ' />' : '>'}`;
+    //   default:
+    //     break;
+    // }
+
+    // return part + closing;
+  })
+  .join(' ');
+}
+
+function processPart(part: string) {
+  switch(true) {
+    case part.includes('='):
+      return assignmentCase(part);
+    case part.indexOf('{{#') === 0:
+      return `<${emberPascalCase(part.slice(3))}`;
+    case part.indexOf('{{') === 0:
+      return `<${emberPascalCase(part.slice(2))}`;
+    default:
+      break;
+  }
+
+  return part;
 }
 
 function convertBlockClosing(text: string) {
@@ -114,17 +138,21 @@ function convertBlockClosing(text: string) {
 }
 
 function assignmentCase(input: string): string {
-  console.log(`Assignment: ${input}`);
-
   const [left, right] = input.split('=');
 
   const LHS = (left.charAt(0) === '@' || left === 'class') ? left : ('@' + left);
   const sanitizedRight = right.replace('}}', '');
 
   const isQuoted = ['"', "'"].includes(sanitizedRight.charAt(0));
+  const isParenthesized = sanitizedRight.startsWith('(') && sanitizedRight.endsWith(')');
+
   const RHS = isNumber(sanitizedRight)
     ? Number(sanitizedRight)
-    : (isQuoted ? wrapInProperQuotes(sanitizedRight, left) :  wrapInCurlyBraces(sanitizedRight));
+    : isQuoted
+    ? wrapInProperQuotes(sanitizedRight, left)
+    : isParenthesized
+    ? `{{${sanitizedRight.substring(1, sanitizedRight.length - 1)}}}`
+    : ['true', 'false', 'null', 'undefined'].includes(sanitizedRight) ? sanitizedRight : `{{${sanitizedRight}}}`;
 
   return [LHS,RHS].join('=');
 }
@@ -134,9 +162,12 @@ function isNumber(x: string): boolean {
 }
 
 function wrapInCurlyBraces(input: string): string {
-  return wrapBy(input, '{{', '}}')
-    .replace('{{{{', '{{')
-    .replace('}}}}', '}}');
+  const content = input
+    .replace(/^\((.*)\)$/, `$1`)
+    .replace(/^"(.*)"$/, `$1`)
+    .replace(/^'(.*)'$/, `$1`);
+
+  return wrapBy(content, '{{', '}}');
 }
 
 function wrapInProperQuotes(input: string, name: string): string {
