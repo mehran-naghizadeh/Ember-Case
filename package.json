@@ -2,7 +2,7 @@
   "name": "embercase",
   "displayName": "EmberCase",
   "description": "It concerts deprecated Ember component syntax to new one",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "license": "MIT",
   "publisher": "behnegar-mehran-naghizadeh",
   "engines": {
@@ -13,6 +13,8 @@
   ],
   "activationEvents": [],
   "main": "./dist/extension.js",
+  "icon": "images/icon128x128.png",
+  "icon64": "images/icon128x128.png",
   "contributes": {
     "commands": [
       {
