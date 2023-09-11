@@ -2,6 +2,9 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
+import { parse } from '@handlebars/parser';
+import { ContentStatement, HashPair, MustacheStatement, PathExpression, Statement } from '@handlebars/parser/types/ast';
+
 // Pattern x=y.yy z=5 class="w-8 h-2 whatever"
 const pattern = /\s+(?=(?:(?:[^"]*"){2})*[^"]*$)/g;
 
@@ -36,6 +39,9 @@ export function activate(context: vscode.ExtensionContext) {
         // Get all lines within the current selection
         const selectedLines = document.getText(selection).split('\n');
 
+        const template = document.getText(selection);
+        mmm(template);
+
         selectedLines.forEach((lineText, index) => {
           const line = document.lineAt(selection.start.line + index);
           const fullLineText = document.getText(line.range);
@@ -49,6 +55,80 @@ export function activate(context: vscode.ExtensionContext) {
   });
 
   context.subscriptions.push(disposable);
+}
+
+function mmm(template: string) {
+  const output: string[] = [];
+
+  const ast = parse(template);
+
+  debugger;
+
+  ast.body.forEach((statement: Statement) => {
+    const innerOutput: string[] = [];
+
+    if (statement.type === 'ContentStatement') {
+      debugger;
+      innerOutput.push((statement as ContentStatement).value);
+
+      return;
+    }
+
+    const attributes: HashPair[] = (statement as MustacheStatement).hash.pairs;
+
+    attributes.forEach(attribute => {
+      const name = attribute.key;
+
+      const { value, original } = attribute.value as any;
+
+      const htmlAttribute = ['class', 'placeholder', 'id'].includes(name);
+
+      switch (attribute.value.type) {
+        case 'ContentStatement':
+          debugger;
+          // innerOutput.push
+          break;
+        case 'PathExpression':
+          debugger;
+          innerOutput.push(`@${name}={{${original}}}`);
+          break;
+        case 'SubExpression':
+          debugger;
+          // output.push(`@${attribute.value.path.head}={{${attribute.value.params.}}}`);
+          break;
+        case 'BooleanLiteral':
+        case 'NumberLiteral':
+          debugger;
+          innerOutput.push(`${htmlAttribute ? '' : '@'}${name}=${value}`);
+          break;
+        case 'StringLiteral':
+          debugger;
+          innerOutput.push(`${htmlAttribute ? '' : '@'}${name}="${value}"`);
+          break;
+        default:
+          debugger;
+          innerOutput.push('UNKNOWN');
+          break;
+      }
+    });
+
+    const componentName = emberPascalCase(((statement as MustacheStatement).path as PathExpression).original);
+
+    const ccc = `<${emberPascalCase(componentName)}\n` + innerOutput.join('\n') + '\n/>';
+    console.log(ccc);
+
+    output.push(ccc);
+  });
+
+  debugger;
+  // {
+  //   key: 'x',
+  //   value: {
+  //     original: 5,
+  //     type: 'BooleanLiteral', 'NumberLiteral', 'PathExpression', 'StringLiteral', 'Subexpression'
+  //     value: 5,
+  //   },
+  // },
 }
 
 // This method is called when your extension is deactivated
