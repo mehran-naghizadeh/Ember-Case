@@ -11,6 +11,8 @@ const blockStartingPattern = /^{{#([\w/-]+)([^}}]*)(}})?$/;
 const multilinerStartingPattern = /^{{(?!\/)([\w/-]+)([^}}]*)$/;
 const onelinerPattern = /^{{(?!\/)([\w/-]+)(.*)}}$/;
 const assignmentsLinePattern = /^((\w+=[^\s]+)\s?)+$/;
+const emberKeywordsPattern = /^({{(#|\/)?)(each|if|else|else if|let|unless)( |}})/;
+const helpersPattern = /^({{(#|\/)?)(array|component|compute|eq|get|gt|lt)( |}})/;
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -58,6 +60,9 @@ function convertedText(text: string): string {
   switch(true) {
     case text === '}}':
       return '/>';
+    case emberKeywordsPattern.test(text):
+    case helpersPattern.test(text):
+      return text;
     case blockClosingPattern.test(text):
       return convertBlockClosing(text);
     case onelinerPattern.test(text):
