@@ -12,6 +12,9 @@ With this extension you can put ypur cursor on the line, then press `Ctrl`+`P`, 
 <XUserAvatar @imageUrl={{user.avatar}} @name={{user.fullName}} class="w-h-6 mr-4 rounded-full Shrink0" />
 ```
 
+![embercase-has-block](https://github.com/mehran-naghizadeh/ember-case/assets/24450563/85382cce-e172-452c-9f05-75292118865f)
+
+
 ## Requirements
 
 None.
