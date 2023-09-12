@@ -20,6 +20,14 @@
       {
         "command": "embercase.emberCase",
         "title": "Ember Case"
+      },
+      {
+        "command": "embercase.thisify",
+        "title": "Thisify"
+      },
+      {
+        "command": "embercase.@ify",
+        "title": "@ify"
       }
     ]
   },
