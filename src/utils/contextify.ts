@@ -12,7 +12,7 @@ export default function contextify(context: '@' | 'this') {
 
   const infix = context === '@' ? '' : '.';
 
-  const searchPattern = new RegExp(`([^-.@])${word}([^=])`, 'g');
+  const searchPattern = new RegExp(`([^-.@'"])${word}([^=])`, 'g');
 
   // word -> @word
   // word -> this.word
