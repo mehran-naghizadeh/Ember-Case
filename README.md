@@ -25,6 +25,7 @@ In the paset it was totally fine to write `{{variable}}` in an Ember template, w
 
 
 <hr>
+
 ![atify](https://github.com/mehran-naghizadeh/ember-case/assets/24450563/e9630660-2888-40ea-a71c-540aeeae31b8)
 
 <hr>
@@ -34,6 +35,7 @@ In the paset it was totally fine to write `{{variable}}` in an Ember template, w
 
 
 <hr>
+
 ![thisify](https://github.com/mehran-naghizadeh/ember-case/assets/24450563/52ed5af7-50be-453e-8f44-d894132fd0a8)
 
 <hr>
