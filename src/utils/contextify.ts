@@ -12,14 +12,13 @@ export default function contextify(context: '@' | 'this') {
 
   const infix = context === '@' ? '' : '.';
 
-  const searchPattern = new RegExp(`([^-.@'"])${word}([^=])`, 'g');
+  const searchPattern = new RegExp(`([ {=])${word}([ .}$])`, 'g');
 
   // word -> @word
   // word -> this.word
   const replacePattern = `$1${context}${infix}${word}$2`;
 
   const modifiedText = editor.document.getText().replace(searchPattern, replacePattern);
-
 
   // Show the Find and Replace widget with the selected word
   vscode.commands.executeCommand('editor.action.startFindReplaceAction');
