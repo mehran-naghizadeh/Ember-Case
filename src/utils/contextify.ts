@@ -21,7 +21,7 @@ export default function contextify(context: '@' | 'this') {
   const modifiedText = editor.document.getText().replace(searchPattern, replacePattern);
 
   // Show the Find and Replace widget with the selected word
-  vscode.commands.executeCommand('editor.action.startFindReplaceAction');
+  vscode.commands.executeCommand('actions.findWithSelection');
 
   // Replace the entire document with the modified text
   editor.edit((editBuilder) => {
