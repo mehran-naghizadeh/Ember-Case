@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import emberCase from './commands/ember-case';
 import atify from './commands/atify';
+import contextify from './commands/contextify';
 import thisify from './commands/thisify';
 
 // This method is called when your extension is activated
@@ -18,6 +19,7 @@ export function activate(context: vscode.ExtensionContext) {
   const commands = [
     { id: 'embercase.emberCase', method: emberCase},
     { id: 'embercase.@ify', method: atify},
+    { id: 'embercase.contextify', method: contextify},
     { id: 'embercase.thisify', method: thisify},
   ];
 

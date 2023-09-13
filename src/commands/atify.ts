@@ -1,5 +1,5 @@
-import contextify from '../utils/contextify';
+import applyContext from '../utils/apply-context';
 
-const atify = () => contextify('@');
+const atify = () => applyContext('@');
 
 export default atify;

@@ -164,7 +164,11 @@ export default function emberCase() {
   // The code you place here will be executed every time your command is executed
   const editor = vscode.window.activeTextEditor;
 
-  if (!editor) { return; }
+  if (!editor) {
+    vscode.window.showInformationMessage('I need an open document to operate on.');
+
+    return;
+  }
 
   const { document, selections } = editor;
 

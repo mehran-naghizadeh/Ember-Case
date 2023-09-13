@@ -1,5 +1,5 @@
-import contextify from '../utils/contextify';
+import applyContext from '../utils/apply-context';
 
-const thisify = () => contextify('this');
+const thisify = () => applyContext('this');
 
 export default thisify;

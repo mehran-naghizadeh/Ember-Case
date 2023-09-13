@@ -2,7 +2,7 @@
   "name": "embercase",
   "displayName": "EmberCase",
   "description": "It converts deprecated Ember component syntax to new one",
-  "version": "0.1.9",
+  "version": "0.2.0",
   "license": "MIT",
   "publisher": "behnegar-mehran-naghizadeh",
   "engines": {
@@ -22,12 +22,16 @@
         "title": "Ember Case"
       },
       {
-        "command": "embercase.thisify",
-        "title": "thisify"
-      },
-      {
         "command": "embercase.@ify",
         "title": "@ify"
+      },
+      {
+        "command": "embercase.contextify",
+        "title": "contextify"
+      },
+      {
+        "command": "embercase.thisify",
+        "title": "thisify"
       }
     ]
   },

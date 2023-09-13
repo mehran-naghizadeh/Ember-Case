@@ -1,14 +1,22 @@
 import * as vscode from 'vscode';
 
-export default function contextify(context: '@' | 'this') {
+export default function applyContext(context: '@' | 'this') {
   const editor = vscode.window.activeTextEditor;
 
-  if (!editor) { return; }
+  if (!editor) {
+    vscode.window.showInformationMessage('I need an open document to operate on.');
+
+    return;
+  }
 
   // Get the user's selected word
   const word = editor.document.getText(editor.selection);
 
-  if (!word) { return; }
+  if (!word) {
+    vscode.window.showInformationMessage('Please select a word in the document and then try again.');
+
+    return;
+  }
 
   const infix = context === '@' ? '' : '.';
 

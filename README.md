@@ -51,6 +51,9 @@ Not all possible cases are covered. In case you stample upon such a case, please
 
 ## Release Notes
 
+### 0.2.0
+Intelligently figure out the proper context of a variable, if the project uses pods structure.
+
 ### 0.1.0
 Facilitate adding `this` or `@` to variable names in templates.
 
