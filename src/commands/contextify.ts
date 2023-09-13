@@ -65,18 +65,73 @@ function siblingContent() {
   return paths;
 }
 
+// Create a text editor decoration type
+const highlightDecorationType = vscode.window.createTextEditorDecorationType({
+  backgroundColor: 'yellow',
+});
+
+function highlightLocalDeclaration(localDeclarationPattern: RegExp, documentContent: string) {
+  const activeEditor = vscode.window.activeTextEditor!;
+  const { document } = activeEditor;
+
+  let decorations: vscode.DecorationOptions[] = [];
+  do {
+    let match = localDeclarationPattern.exec(documentContent);
+
+    if (!match) { break; }
+
+    const startPos = document.positionAt(match.index);
+    const endPos = document.positionAt(match.index + match[0].length);
+    const range = new vscode.Range(startPos, endPos);
+    const decoration = { range, hoverMessage: 'This is the local declaration.' };
+    decorations.push(decoration);
+  } while(true);
+
+  activeEditor.setDecorations(highlightDecorationType, decorations);
+
+  // Scroll to the first highlight if there is at least one
+  if (decorations.length > 0) {
+    const firstHighlightRange = decorations[0].range;
+    activeEditor.revealRange(firstHighlightRange, vscode.TextEditorRevealType.InCenter);
+
+    vscode.workspace.onDidChangeTextDocument((event) => {
+      if (event.document === document) {
+        // Clear decorations when the document changes
+        decorations = [];
+        activeEditor.setDecorations(highlightDecorationType, []);
+      }
+    });
+
+        // Listen for text editor selection change and clear decorations
+    vscode.window.onDidChangeTextEditorSelection((event) => {
+      // Clear decorations when the user selects a part of the text
+      decorations = [];
+      activeEditor.setDecorations(highlightDecorationType, []);
+    });
+  }
+}
+
 const contextify = () => {
   const word = getWord();
 
   if (!word) { return; }
 
-  if (['currentClient', 'currentUser', 'permissions'].includes(word)) {
-    thisify();
+  if (!isTemplate()) {
+    vscode.window.showInformationMessage('This command is only available for "template.hbs" files.');
     return;
   }
 
-  if (!isTemplate()) {
-    vscode.window.showInformationMessage('This command is only available for "template.hbs" files.');
+  const localDeclarationPattern = new RegExp(`as \\|[^|]*${word}[^|]*\\|`, 'g');
+  const documentContent = editor()!.document.getText();
+
+  if (localDeclarationPattern.test(documentContent)) {
+    highlightLocalDeclaration(localDeclarationPattern, documentContent);
+    vscode.window.showInformationMessage('This is a local variable. No context needed.');
+    return;
+  }
+
+  if (['currentClient', 'currentUser', 'permissions'].includes(word)) {
+    thisify();
     return;
   }
 
