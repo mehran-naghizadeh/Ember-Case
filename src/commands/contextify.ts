@@ -23,7 +23,7 @@ function getWord() {
 }
 
 function isTemplate () {
-  return editor()?.document.fileName.endsWith('template.hbs') ?? false;
+  return editor()?.document.fileName.endsWith('.hbs') ?? false;
 }
 
 function siblingContent() {
@@ -117,7 +117,7 @@ const contextify = () => {
   if (!word) { return; }
 
   if (!isTemplate()) {
-    vscode.window.showInformationMessage('This command is only available for "template.hbs" files.');
+    vscode.window.showInformationMessage('This command is only available for "*.hbs" files.');
     return;
   }
 
