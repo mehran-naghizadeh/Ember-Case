@@ -144,6 +144,11 @@ const contextify = () => {
 
   const content: Record<string, string> = siblingContent() ?? {};
 
+  if ((content['route'] || content['controller']) && word !== 'model') {
+    thisify();
+    return;
+  }
+
   const isLocal = Object.entries(content).some(([type, text]) => {
     return patterns.some(pattern => pattern.test(text));
   });
