@@ -12,7 +12,7 @@ const onelinerPattern = /^{{(?!\/)([\w/-]+)(.*)}}$/;
 const assignmentPattern = /\w+\s*=\s*(?:\([^)]+\)|\S+)/g;
 const assignmentsLinePattern = /^(\w+\s*=.+)+$/;
 const emberKeywordsPattern = /^({{(#|\/)?)(each|if|else|else if|let|unless)( |}})/;
-const helpersPattern = /^({{(#|\/)?)(array|component|compute|eq|get|gt|lt)( |}})/;
+const helpersPattern = /^({{(#|\/)?)(array|component|compute|eq|get|gt|includes|lt)( |}})/;
 
 function convertedText(text: string): string {
   switch(true) {
