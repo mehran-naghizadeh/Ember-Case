@@ -2,8 +2,9 @@ import * as vscode from 'vscode';
 import { Selection, TextLine, WorkspaceEdit } from 'vscode';
 
 // Pattern x=y.yy z=5 class="w-8 h-2 whatever"
-// const pattern = /\s+(?=(?:(?:[^"]*"){2})*[^"]*$)/g;
-const pattern = /(?:[^"'\s()]*(?:"[^"]*"[^"'\s()]*)*|[^"'\s()]+|\([^)]*\)|}})+/g;
+// const pattern_version_1 = /\s+(?=(?:(?:[^"]*"){2})*[^"]*$)/g;
+// const pattern_version_2 = /(?:[^"'\s()]*(?:"[^"]*"[^"'\s()]*)*|[^"'\s()]+|\([^)]*\)|}})+/g;
+const pattern = /(?:[^"'\s()]*(?:["'][^"']*["'][^"'\s()]*)*|[^"'\s()]+|\([^)]*\)|}})+/g;
 
 // Pattern: {{/some/where/quite-strange/some-thing}}
 const blockClosingPattern = /^{{\/([\w/-]+)}}$/;
@@ -56,21 +57,6 @@ function convertTag(text: string): string {
     const closing = part.endsWith('}}') ? (isOneliner ? ' />' : '>') : '';
 
     return processPart(part.replace(/}}$/, '')) + closing;
-
-    // switch(true) {
-    //   case part.includes('='):
-    //     return assignmentCase(part);
-    //   case part.indexOf('{{#') === 0:
-    //     return `<${emberPascalCase(part.slice(3))}`;
-    //   case part.indexOf('{{') === 0:
-    //     return `<${emberPascalCase(part.slice(2))}`;
-    //   case part.indexOf('}}') === part.length - 2:
-    //     return `${emberPascalCase(part.slice(0, part.length - 2))}${isOneliner ? ' />' : '>'}`;
-    //   default:
-    //     break;
-    // }
-
-    // return part + closing;
   })
   .join(' ');
 }
