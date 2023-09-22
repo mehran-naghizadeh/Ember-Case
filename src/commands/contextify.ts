@@ -136,7 +136,7 @@ const contextify = () => {
   }
 
   const patterns = [
-    new RegExp(`${word}: (computed|alias|oneWay|reads|and|or|not)`),
+    new RegExp(`${word}: (computed|alias|filterBy|oneWay|reads|and|or|not)`),
     new RegExp(`this\.set\\('${word}',`),
     new RegExp(`set\\(this, '${word}',`),
     new RegExp(`this\.${word} =`),
