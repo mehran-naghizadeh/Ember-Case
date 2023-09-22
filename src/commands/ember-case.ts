@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { Selection, TextLine, WorkspaceEdit } from 'vscode';
 
 // Pattern x=y.yy z=5 class="w-8 h-2 whatever"
 // const pattern = /\s+(?=(?:(?:[^"]*"){2})*[^"]*$)/g;
@@ -160,6 +161,17 @@ function upperFirstCase(word: string): string {
   return `${firstLetter.toUpperCase()}${rest}`;
 }
 
+function nonOverlapping(selections: readonly Selection[]): Selection[] {
+  return selections.reduce(
+    (acc, item) => {
+      return acc.some((sel) => sel.start.line === item.start.line)
+        ? acc
+        : [...acc, item];
+    },
+    [] as Selection[],
+  );
+}
+
 export default function emberCase() {
   // The code you place here will be executed every time your command is executed
   const editor = vscode.window.activeTextEditor;
@@ -172,8 +184,11 @@ export default function emberCase() {
 
   const { document, selections } = editor;
 
+  // Create a WorkspaceEdit to accumulate the edit operations
+  const workspaceEdit = new WorkspaceEdit();
+
   editor.edit((editBuilder: vscode.TextEditorEdit) => {
-    selections.forEach((selection) => {
+    nonOverlapping(selections).forEach((selection) => {
       // Get all lines within the current selection
       const selectedLines = document.getText(selection).split('\n');
 
@@ -183,8 +198,11 @@ export default function emberCase() {
 
         const indentSteps = fullLineText.indexOf(fullLineText.trim());
         const indentation = new Array(indentSteps + 1).join(' ');
-        editBuilder.replace(line.range, `${indentation}${convertedText(fullLineText.trim())}`);
+
+        workspaceEdit.replace(document.uri, line.range, `${indentation}${convertedText(fullLineText.trim())}`);
       });
     });
+
+    vscode.workspace.applyEdit(workspaceEdit);
   });
 };
