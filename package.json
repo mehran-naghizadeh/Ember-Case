@@ -2,7 +2,7 @@
   "name": "embercase",
   "displayName": "EmberCase",
   "description": "It converts deprecated Ember component syntax to new one",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "license": "MIT",
   "publisher": "behnegar-mehran-naghizadeh",
   "engines": {
