@@ -26,6 +26,10 @@
         "title": "@ify"
       },
       {
+        "command": "embercase.deget",
+        "title": "De Get"
+      },
+      {
         "command": "embercase.contextify",
         "title": "contextify"
       },

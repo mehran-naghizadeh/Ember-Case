@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import emberCase from './commands/ember-case';
 import atify from './commands/atify';
+import deget from './commands/deget';
 import contextify from './commands/contextify';
 import thisify from './commands/thisify';
 
@@ -12,7 +13,7 @@ export function activate(context: vscode.ExtensionContext) {
   // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated
   console.log('Congratulations, your extension "embercase" is now active!');
-  
+
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
@@ -20,12 +21,13 @@ export function activate(context: vscode.ExtensionContext) {
     { id: 'embercase.emberCase', method: emberCase},
     { id: 'embercase.@ify', method: atify},
     { id: 'embercase.contextify', method: contextify},
+    { id: 'embercase.deget', method: deget},
     { id: 'embercase.thisify', method: thisify},
   ];
 
-  commands.forEach(({id, method}) => {
+  commands.forEach(({ id, method }) => {
     const disposable = vscode.commands.registerCommand(id, method);
-  
+
     context.subscriptions.push(disposable);
   });
 }

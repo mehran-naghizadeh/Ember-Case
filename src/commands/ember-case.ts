@@ -185,7 +185,11 @@ export default function emberCase() {
         const indentSteps = fullLineText.indexOf(fullLineText.trim());
         const indentation = new Array(indentSteps + 1).join(' ');
 
-        workspaceEdit.replace(document.uri, line.range, `${indentation}${convertedText(fullLineText.trim())}`);
+        workspaceEdit.replace(
+          document.uri,
+          line.range,
+          `${indentation}${convertedText(fullLineText.trim())}`,
+        );
       });
     });
 

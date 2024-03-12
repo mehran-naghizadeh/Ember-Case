@@ -40,6 +40,13 @@ In the paset it was totally fine to write `{{variable}}` in an Ember template, w
 
 <hr>
 
+### Javascript syntax manipulation
+
+**De get**
+
+Conveniently change `this.get('something.somethingElse')` to `this.somethibg.get('somethingElse')` by Running `De Get` command from the palette (`Command + Shift + P`).
+
+
 ## Requirements
 
 An Ember project 🤓
