@@ -54,6 +54,11 @@ Conveniently change `this.get('something.somethingElse')` to `this.somethibg.get
 **setify**
 
 Conveniently substitute `this.set('key.child1.child2', value)` with `set(this.key, 'child1.child2', value)` by running `setify` command from the palette (`Command + Shift + P`).
+
+![h](https://github.com/mehran-naghizadeh/ember-case/assets/24450563/5166ce44-fd79-4a98-a40d-73241d7d2a4c)
+
+<hr>
+
 ## Requirements
 
 An Ember project 🤓
