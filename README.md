@@ -44,13 +44,16 @@ In the paset it was totally fine to write `{{variable}}` in an Ember template, w
 
 **De get**
 
-Conveniently change `this.get('something.somethingElse')` to `this.somethibg.get('somethingElse')` by Running `De Get` command from the palette (`Command + Shift + P`).
+Conveniently change `this.get('something.somethingElse')` to `this.somethibg.get('somethingElse')` by running `De Get` command from the palette (`Command + Shift + P`).
 
 ![g](https://github.com/mehran-naghizadeh/ember-case/assets/24450563/5cf8364a-0bdf-44fc-9014-8a8b6bc58817)
 
 
 <hr>
 
+**setify**
+
+Conveniently substitute `this.set('key.child1.child2', value)` with `set(this.key, 'child1.child2', value)` by running `setify` command from the palette (`Command + Shift + P`).
 ## Requirements
 
 An Ember project 🤓

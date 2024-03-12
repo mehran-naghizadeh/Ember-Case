@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import { Selection, WorkspaceEdit } from 'vscode';
 
-export default function deget() {
-  // The code you place here will be executed every time your command is executed
+export default function setify() {
+  // The code you place here will be executed every time ypur command is executed
   const editor = vscode.window.activeTextEditor;
 
   if (!editor) {
@@ -28,22 +28,22 @@ export default function deget() {
         const indentSteps = fullLineText.indexOf(fullLineText.trim());
         const indentation = new Array(indentSteps + 1).join(' ');
 
-        const degettedText = fullLineText
-          .replace(/this\.get\('([^']+)'\)/g, (_, x) => {
-            const parts = x.split('.');
-            const variableName: string = parts.shift();
-            const propertiesPath: string[] = parts.join('.');
+        const setifiedText = fullLineText
+          .replace(/this.set\('([^']+)', ?([^()]+)\)/, (_, key, value) => {
+            const parts = key.split('.');
+            const keyName = parts.shift();
+            const propertiesPath = parts.join('.');
 
             return propertiesPath.length === 0
-              ? `this.${variableName}`
-              : `this.${variableName}.get('${propertiesPath}')`;
+              ? `set(this, '${keyName}', ${value})`
+              : `set(this.${keyName}, '${propertiesPath}', ${value})`;
           })
           .trim();
 
         workspaceEdit.replace(
           document.uri,
           line.range,
-          `${indentation}${degettedText}`,
+          `${indentation}${setifiedText}`,
         );
       });
     });
